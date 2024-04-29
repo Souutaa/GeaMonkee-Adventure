@@ -93,7 +93,7 @@ class GameView(arcade.View):
 
         # Map name
         map_path = pathlib.Path(__file__).resolve(
-        ).parent.parent / 'arcade_platformer'
+        ).parent.parent / 'levels'
         map_name = map_path / f"platform_level_0{self.level}.json"
         # Layer Specific Options for the Tilemap
         layer_options = {
@@ -438,7 +438,7 @@ class GameView(arcade.View):
                 self.times = TIME_LIMIT
                 if (self.lives == 0):
                     # TODO: Add game over view
-                    pass;
+                    pass
                 return
             if self.scene["Doors"] in collision.sprite_lists:
                 # Advance to the next level

@@ -1,5 +1,5 @@
-from Entity import Entity
 from constants import *
+from entities.Entity import Entity
 
 
 class Enemy(Entity):

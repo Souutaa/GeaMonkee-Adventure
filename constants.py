@@ -17,7 +17,7 @@ GRAVITY = 1
 PLAYER_JUMP_SPEED = 20
 
 # Assets path
-ASSETS_PATH = pathlib.Path(__file__).resolve().parent.parent / "assets"
+ASSETS_PATH = pathlib.Path(__file__).resolve().parent / "assets"
 
 # Constants used to scale our sprites from their original size
 CHARACTER_SCALING = 0.5
