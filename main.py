@@ -1,5 +1,6 @@
 
 import arcade
+import arcade.gui
 
 from constants import *
 from views.game import GameView

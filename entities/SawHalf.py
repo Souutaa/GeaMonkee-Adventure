@@ -1,4 +1,4 @@
-from Enemy import Enemy
+from entities.Enemy import Enemy
 
 
 class SawHalf(Enemy):

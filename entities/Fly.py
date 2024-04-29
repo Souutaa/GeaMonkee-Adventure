@@ -1,5 +1,5 @@
-from Enemy import Enemy
 
+from entities.Enemy import Enemy
 
 class Fly(Enemy):
     def __init__(self):
