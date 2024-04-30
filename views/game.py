@@ -9,6 +9,8 @@ from entities.Saw import Saw
 from entities.SlimeBlue import SlimeBlue
 from entities.SlimeGreen import SlimeGreen
 
+from views.gameComplete import GameCompleteView
+from views.gameOver import GameOverView
 
 class GameView(arcade.View):
     """
@@ -314,7 +316,8 @@ class GameView(arcade.View):
             self.score = 0
             self.times = TIME_LIMIT
             if (self.lives == 0):
-                # TODO: Add game over screen
+                game_over = GameOverView(self.high_score)
+                self.window.show_view(game_over)
                 return
         if self.physics_engine.can_jump():
             self.player_sprite.can_jump = False
@@ -437,8 +440,8 @@ class GameView(arcade.View):
                 self.score = 0
                 self.times = TIME_LIMIT
                 if (self.lives == 0):
-                    # TODO: Add game over view
-                    pass
+                    game_over = GameOverView(self.high_score)
+                    self.window.show_view(game_over)
                 return
             if self.scene["Doors"] in collision.sprite_lists:
                 # Advance to the next level
@@ -446,8 +449,8 @@ class GameView(arcade.View):
                 self.score += math.floor(self.times * 10)
                 self.lives = 3
                 if self.level == LEVELS:
-                    # TODO: Add game completed view
-                    pass
+                    game_complete = GameCompleteView(self.high_score)
+                    self.window.show_view(game_complete)
                     return
                 # Load the next level
                 self.times = TIME_LIMIT
