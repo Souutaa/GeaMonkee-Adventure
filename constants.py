@@ -1,5 +1,10 @@
 import pathlib
 
+
+
+SERVER = "192.168.1.12"
+PORT = 5555
+
 # Constants
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 650
