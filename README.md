@@ -5,10 +5,10 @@
 [I. Mở đầu](#Modau)
 
 - [1. Tổng quan](#tongquan)
-- [2. Các thành phần của game](#windows)
+- [2. Các thành phần của game](#cacthanhphancuagame)
 
   - [2.1. Nhân vật](#21nhanvat)
-  - [2.2. Quái](#22quai)
+  - [2.2. Quái vật](#22quai)
   - [2.3. Vật phẩm](#23vatpham)
 
 [II. Ngôn ngữ Python](#ngonngupython)
@@ -26,8 +26,76 @@
 
 ## I. Mở đầu
 
-`GeaMonkee-Adventure` có thể loại là Platform game. Đây là một thể loại game điện tử và cũng là một phần của game hành động. Mục đích cốt lõi của tất cả game đi cảnh là người chơi sẽ điều khiển nhân vật trong game vượt qua các chướng ngại vật trong game bằng cách leo trèo, nhảy xa, đu dây và tiêu diệt.
-Các cấp độ và môi trường sẽ càng ngày càng khó với những môi trường với địa hình phức tạp cùng những dạng quái vật mới, đòi hỏi thao tác điêu luyện từ người chơi.
+`GeaMonkee-Adventure`
+
+- Là game được viết bằng ngôn ngữ `Python` và sử dụng phiên bản: _`3.9.13 64-bit`_
+- Và thuộc thể loại **Platform game**. Đây là một thể loại game điện tử và cũng là một phần của game hành động. Mục đích cốt lõi của tất cả game đi cảnh là người chơi sẽ điều khiển nhân vật trong game vượt qua các chướng ngại vật trong game bằng cách leo trèo, nhảy xa, đu dây và tiêu diệt.
+  Các cấp độ và môi trường sẽ càng ngày càng khó với những môi trường với địa hình phức tạp cùng những dạng quái vật mới, đòi hỏi thao tác điêu luyện từ người chơi.
+
+<a name="#tongquan"></a>
+
+### 1. Tổng quan
+
+BACKGROUND CỦA GAME ĐƯỢC CHIA THÀNH 4 MÙA
+
+<div style="width: 26% ;display:flex; margin:auto 0">
+<img src="./assets/images/Backgrounds/colored_grass.png">
+<img src="./assets/images/Backgrounds/colored_desert.png">
+<img src="./assets/images/Backgrounds/blue_land.png">
+<img src="./assets/images/Backgrounds/colored_shroom.png">
+</div>
+
+<a name="#cacthanhphancuagame"></a>
+
+### 2. Cách thành phần của game
+
+<a name="#21nhanvat"></a>
+
+#### 2.1 Nhân Vật
+
+<div style="width: 100% ;display:flex; margin:auto 0; justify-content: center;flex-wrap: wrap">
+<img src="./assets/images/Players/alienGreen_climb1.png">
+<img src="./assets/images/Players/alienGreen_front.png">
+<img src="./assets/images/Players/alienGreen_hit.png">
+<img src="./assets/images/Players/alienGreen_jump.png">
+<img src="./assets/images/Players/alienGreen_swim1.png">
+<img src="./assets/images/Players/alienGreen_duck.png">
+</div>
+
+<a name="#22quai"></a>
+
+#### 2.2 Quái Vật
+
+<div style="width: 100% ;display:flex; justify-content: center;flex-wrap: wrap">
+<img src="./assets/images/Enemies/barnacle.png">
+<img src="./assets/images/Enemies/bee.png">
+<img src="./assets/images/Enemies/fishBlue.png">
+<img src="./assets/images/Enemies/fishGreen.png">
+<img src="./assets/images/Enemies/fishPink.png">
+<img src="./assets/images/Enemies/fly.png">
+<img src="./assets/images/Enemies/frog.png">
+<img src="./assets/images/Enemies/wormPink.png">
+<img src="./assets/images/Enemies/mouse.png">
+<img src="./assets/images/Enemies/saw.png">
+<img src="./assets/images/Enemies/slimeBlock.png">
+<img src="./assets/images/Enemies/snail.png">
+</div>
+
+<a name="#23vatpham"></a>
+
+#### 2.3 Vật Phẩm
+
+<div style="width: 100% ;display:flex; margin:auto 0; justify-content: center;flex-wrap: wrap">
+<img src="./assets/images/Items/coinBronze.png">
+<img src="./assets/images/Items/coinSilver.png">
+<img src="./assets/images/Items/coinGold.png">
+<img src="./assets/images/Items/gemBlue.png">
+<img src="./assets/images/Items/gemGreen.png">
+<img src="./assets/images/Items/gemRed.png">
+<img src="./assets/images/Items/keyBlue.png">
+<img src="./assets/images/Items/keyGreen.png">
+<img src="./assets/images/Items/keyYellow.png">
+</div>
 
 <a name="ngonngupython"></a>
 
@@ -88,11 +156,11 @@ import socket
 
 ## Tổng kết
 
-Bài viết trên tôi tổng hợp lại những kiến thức thu được khi sử dụng git và github cho công việc của tôi (sys admin), hi vọng nó giúp các bạn một phần nào đó.
+Đây là toàn bộ nội dung tổng quát nhất về GeaMonkee-Adventure.
 
-Chắc chắn bài viết còn có nhiều thiếu sót, mong các bạn thông cảm và gửi feedback cho tôi để hoàn thiện thêm.
+Hy vọng bạn cài đặt đầy đủ packages trước khi chơi game và có trai nghiệm tốt nhất.
 
-Liên lạc của tôi:
+Liên lạc với chúng tôi khi bạn cần:
 
 - Email:
   - quocvi1701@gmail.com
