@@ -32,7 +32,7 @@
 - Và thuộc thể loại **Platform game**. Đây là một thể loại game điện tử và cũng là một phần của game hành động. Mục đích cốt lõi của tất cả game đi cảnh là người chơi sẽ điều khiển nhân vật trong game vượt qua các chướng ngại vật trong game bằng cách leo trèo, nhảy xa, đu dây và tiêu diệt.
   Các cấp độ và môi trường sẽ càng ngày càng khó với những môi trường với địa hình phức tạp cùng những dạng quái vật mới, đòi hỏi thao tác điêu luyện từ người chơi.
 
-<a name="#tongquan"></a>
+<a name="tongquan"></a>
 
 ### 1. Tổng quan
 
@@ -45,11 +45,11 @@ BACKGROUND CỦA GAME ĐƯỢC CHIA THÀNH 4 MÙA
 <img src="./assets/images/Backgrounds/colored_shroom.png">
 </div>
 
-<a name="#cacthanhphancuagame"></a>
+<a name="cacthanhphancuagame"></a>
 
 ### 2. Cách thành phần của game
 
-<a name="#21nhanvat"></a>
+<a name="21nhanvat"></a>
 
 #### 2.1 Nhân Vật
 
@@ -62,7 +62,7 @@ BACKGROUND CỦA GAME ĐƯỢC CHIA THÀNH 4 MÙA
 <img src="./assets/images/Players/alienGreen_duck.png">
 </div>
 
-<a name="#22quai"></a>
+<a name="22quai"></a>
 
 #### 2.2 Quái Vật
 
@@ -81,7 +81,7 @@ BACKGROUND CỦA GAME ĐƯỢC CHIA THÀNH 4 MÙA
 <img src="./assets/images/Enemies/snail.png">
 </div>
 
-<a name="#23vatpham"></a>
+<a name="23vatpham"></a>
 
 #### 2.3 Vật Phẩm
 
