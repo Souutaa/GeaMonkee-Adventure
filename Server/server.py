@@ -17,14 +17,14 @@ print("Waiting for connection, Server started")
 
 def read_pos(str):
     str = str.split(',')
-    return float(str[0]), float(str[1])
+    return float(str[0]), float(str[1]), int(str[2]), float(str[3])
 
 
 def make_pos(tup):
-    return str(tup[0]) + "," + str(tup[1])
+    return str(tup[0]) + "," + str(tup[1]) + "," + str(tup[2]) + "," + str(tup[3])
 
 
-pos = [(0, 0), (100, 100)]
+pos = [(0, 0, 0, 1), (100, 100, 0, 1)]
 
 
 def threaded_client(conn, player):
