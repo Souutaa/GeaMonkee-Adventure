@@ -12,7 +12,7 @@ class QuitButton(arcade.gui.UIFlatButton):
         arcade.exit()
 
 
-class MyWindow(arcade.View):
+class MainWindow(arcade.View):
     def __init__(self):
         # --- Required for all code that uses UI element,
         # a UIManager to handle the UI.
@@ -89,7 +89,7 @@ class MyWindow(arcade.View):
 
 def main():
     window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    game_start = MyWindow()
+    game_start = MainWindow()
     window.show_view(game_start)
     arcade.run()
 

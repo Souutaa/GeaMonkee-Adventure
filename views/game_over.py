@@ -55,5 +55,5 @@ class GameOverView(arcade.View):
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         """Use a mouse press to advance to the 'game' view."""
-        my_window = main.MyWindow()
+        my_window = main.MainWindow()
         self.window.show_view(my_window)

@@ -9,15 +9,14 @@ from entities.Saw import Saw
 from entities.SlimeBlue import SlimeBlue
 from entities.SlimeGreen import SlimeGreen
 
-import views.gameOver as gameover
-import views.gameComplete as gamecomplete
+import views.game_over as gameover
+import views.game_complete as gamecomplete
 
 
 class SinglePlayerView(arcade.View):
     """
     Main application class.
     """
-
     def __init__(self):
 
         # Call the parent class and set up the window
@@ -303,7 +302,7 @@ class SinglePlayerView(arcade.View):
 
     def on_update(self, delta_time):
         """Movement and game logic"""
-        # Send and recived player 2 pos here
+        # Send and receive player 2 pos here
         # Move the player with the physics engine
         self.physics_engine.update()
         self.times -= delta_time

@@ -15,7 +15,6 @@ print("Waiting for connection, Server started")
 
 pos = [(0, 0, 0, 1), (100, 100, 0, 1)]
 
-
 def threaded_client(conn, player):
     conn.send(str.encode(make_pos(pos[player])))
     reply = ""

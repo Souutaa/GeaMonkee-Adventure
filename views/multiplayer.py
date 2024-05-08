@@ -12,8 +12,8 @@ from entities.SlimeGreen import SlimeGreen
 from network import Network
 from utils import *
 
-import views.gameOver as gameover
-import views.gameComplete as gamecomplete
+import views.game_over as gameover
+import views.game_complete as gamecomplete
 
 class MultiPlayerView(arcade.View):
     """
