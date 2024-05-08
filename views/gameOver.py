@@ -1,7 +1,8 @@
 import arcade
 
 from constants import *
-from main import MyWindow
+
+import main as main
 
 
 class GameOverView(arcade.View):
@@ -54,5 +55,5 @@ class GameOverView(arcade.View):
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         """Use a mouse press to advance to the 'game' view."""
-        my_window = MyWindow()
+        my_window = main.MyWindow()
         self.window.show_view(my_window)

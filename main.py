@@ -1,9 +1,9 @@
-
 import arcade
 import arcade.gui
 
 from constants import *
-from views.game import GameView
+import views.singleplayer as singlePlayer
+import views.multiplayer as multiPlayer
 from views.menu import MenuView
 
 
@@ -28,8 +28,14 @@ class MyWindow(arcade.View):
         self.v_box = arcade.gui.UIBoxLayout()
 
         # Create the buttons
-        start_button = arcade.gui.UIFlatButton(text="Start Game", width=200)
-        self.v_box.add(start_button.with_space_around(bottom=20))
+        start_single_player_button = arcade.gui.UIFlatButton(
+            text="Start Game", width=200)
+        self.v_box.add(start_single_player_button.with_space_around(bottom=20))
+
+        # Multiplayer button
+        start_multiplayer_button = arcade.gui.UIFlatButton(
+            text="Start multiplayer game", width=200)
+        self.v_box.add(start_multiplayer_button.with_space_around(bottom=20))
 
         tutorial_button = arcade.gui.UIFlatButton(text="Tutorial", width=200)
         self.v_box.add(tutorial_button.with_space_around(bottom=20))
@@ -40,7 +46,8 @@ class MyWindow(arcade.View):
 
         # --- Method 2 for handling click events,
         # assign self.on_click_start as callback
-        start_button.on_click = self.on_click_start
+        start_single_player_button.on_click = self.on_click_start
+        start_multiplayer_button.on_click = self.on_click_start_multiplay
 
         # --- Method 3 for handling click events,
         # use a decorator to handle on_click events
@@ -60,7 +67,12 @@ class MyWindow(arcade.View):
 
     def on_click_start(self, event):
         self.manager.disable()
-        game_view = GameView()
+        game_view = singlePlayer.SinglePlayerView()
+        self.window.show_view(game_view)
+
+    def on_click_start_multiplay(self, event):
+        self.manager.disable()
+        game_view = multiPlayer.MultiPlayerView()
         self.window.show_view(game_view)
 
     def on_draw(self):

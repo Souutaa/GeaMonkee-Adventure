@@ -1,8 +1,6 @@
 import pathlib
 
-
-
-SERVER = "192.168.1.12"
+SERVER = "10.65.15.165"
 PORT = 5555
 
 # Constants

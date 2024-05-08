@@ -1,351 +1,21 @@
-"""
-GeaMonkee's Game
-"""
-import arcade
-import pathlib
-import os
 import math
-import arcade.gui
-
-from Server.Network import Network
-
-# Constants
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-SCREEN_TITLE = "GeaMonkee's Adventure"
-
-# Shooting Constants
-SPRITE_SCALING_LASER = 0.8
-SHOOT_SPEED = 15
-BULLET_SPEED = 12
-BULLET_DAMAGE = 50
-
-# Movement speed of player, in pixels per frame
-PLAYER_MOVEMENT_SPEED = 7
-GRAVITY = 1
-PLAYER_JUMP_SPEED = 20
-
-# Assets path
-ASSETS_PATH = pathlib.Path(__file__).resolve().parent.parent / "assets"
-
-# Constants used to scale our sprites from their original size
-CHARACTER_SCALING = 0.5
-TILE_SCALING = 0.5
-COIN_SCALING = 0.5
-SPRITE_PIXEL_SIZE = 128
-MAP_WIDTH = 50 * 64
-MAP_HEIGHT = 20 * 64
-GRID_PIXEL_SIZE = SPRITE_PIXEL_SIZE * TILE_SCALING
-
-# How many pixels to keep as a minimum margin between the character
-# and the edge of the screen.
-LEFT_VIEWPORT_MARGIN = 200
-RIGHT_VIEWPORT_MARGIN = 200
-BOTTOM_VIEWPORT_MARGIN = 150
-TOP_VIEWPORT_MARGIN = 100
-
-# Constants used to track if the player is facing left or right
-RIGHT_FACING = 0
-LEFT_FACING = 1
-
-# Timer
-# TIME_LIMIT = 60
-
-# Total levels
-LEVELS = 5
-
-
-# Player starting position
-PLAYER_START_X = 64
-PLAYER_START_Y = 225
-
-# Layer Names from our TileMap
-LAYER_NAME_MOVING_PLATFORMS = "Moving Platforms"
-LAYER_NAME_LADDERS = "Ladders"
-LAYER_NAME_PLATFORMS = "Platforms"
-LAYER_NAME_COINS = "Coins"
-LAYER_NAME_FOREGROUND = "Foreground"
-LAYER_NAME_BACKGROUND = "Background"
-LAYER_NAME_DONT_TOUCH = "Don't Touch"
-LAYER_NAME_DOOR = "Doors"
-LAYER_NAME_PLAYER = "Player"
-LAYER_NAME_ENEMIES = "Enemies"
-LAYER_NAME_BULLETS = "Bullets"
-
-clientNumber = 0
-
-
-def load_texture_pair(filename):
-    """
-    Load a texture pair, with the second being a mirror image.
-    """
-    return [
-        arcade.load_texture(filename),
-        arcade.load_texture(filename, flipped_horizontally=True),
-    ]
-
-
-class Entity(arcade.Sprite):
-    def __init__(self, name_file, custom_scale=1):
-        super().__init__()
-        # Default to facing right
-        self.facing_direction = RIGHT_FACING
-
-        # Used for image sequences
-        self.cur_texture = 0
-        self.scale = custom_scale
-        self.character_face_direction = RIGHT_FACING
-
-        # main_path = f":resources:images/animated_characters/{name_folder}/{name_file}"
-        main_path = ASSETS_PATH / 'images' / 'Enemies'
-
-        self.idle_texture_pair = load_texture_pair(
-            main_path / f"{name_file}.png")
-
-        # Load textures for walking
-        self.walk_textures = []
-        self.walk_textures.append(
-            load_texture_pair(main_path / f"{name_file}.png"))
-        self.walk_textures.append(load_texture_pair(
-            main_path / f"{name_file}_move.png"))
-
-        # Set the initial texture
-        self.texture = self.idle_texture_pair[0]
-
-        # Hit box will be set based on the first image used. If you want to specify
-        # a different hit box, you can do it like the code below.
-        # set_hit_box = [[-22, -64], [22, -64], [22, 28], [-22, 28]]
-        self.hit_box = self.texture.hit_box_points
-
-
-class Enemy(Entity):
-    def __init__(self, name_file, custom_scale=1):
-
-        # Setup parent class
-        super().__init__(name_file, custom_scale)
-        self.should_update_walk = 0
-
-    def update_animation(self, delta_time: float = 1 / 60):
-
-        # Figure out if we need to flip face left or right
-        if self.change_x > 0 and self.facing_direction == RIGHT_FACING:
-            self.facing_direction = LEFT_FACING
-        elif self.change_x < 0 and self.facing_direction == LEFT_FACING:
-            self.facing_direction = RIGHT_FACING
-
-        # Idle animation
-        if self.change_x == 0:
-            self.texture = self.idle_texture_pair[self.facing_direction]
-            return
-
-        # Walking animation
-        if self.should_update_walk == 3:
-            self.cur_texture += 1
-            if self.cur_texture > 1:
-                self.cur_texture = 0
-            self.texture = self.walk_textures[self.cur_texture][self.facing_direction]
-            self.should_update_walk = 0
-            return
-
-        self.should_update_walk += 1
-
-
-class SlimeGreen(Enemy):
-    def __init__(self):
-
-        # Set up parent class
-        super().__init__("slimeGreen")
-        self.health = 50
-        self.points = 20
-
-
-class SlimeBlue(Enemy):
-    def __init__(self):
-
-        # Set up parent class
-        super().__init__("slimeBlue")
-        self.health = 50
-        self.points = 20
-
-
-class Saw(Enemy):
-    def __init__(self):
-
-        # Set up parent class
-        super().__init__("saw", 0.5)
-        self.health = 9999999
-
-
-class SawHalf(Enemy):
-    def __init__(self):
-
-        # Set up parent class
-        super().__init__("sawHalf")
-        self.health = 50
-
-
-class Fly(Enemy):
-    def __init__(self):
-
-        # Set up parent class
-        super().__init__("fly", 0.5)
-        self.health = 50
-        self.points = 30
-
-
-class PlayerCharacter(arcade.Sprite):
-    """Player Sprite"""
-
-    def __init__(self):
-
-        # Set up parent class
-        super().__init__()
-        # Default to facing right
-        self.facing_direction = RIGHT_FACING
-
-        # Used for flipping between image sequences
-        self.cur_texture = 0
-        self.scale = CHARACTER_SCALING
-
-        # Track our state
-        self.jumping = False
-        self.climbing = False
-        self.is_on_ladder = False
-
-        # --- Load Textures ---
-
-        # Images from Kenney.nl's Asset Pack 3
-        main_path = ASSETS_PATH / 'images' / 'Players'
-        # Load textures for idle standing
-        self.idle_texture_pair = load_texture_pair(
-            main_path / f"alienGreen_stand.png")
-        self.jump_texture_pair = load_texture_pair(
-            main_path / f"alienGreen_jump.png")
-
-        # Load textures for walking
-        self.walk_textures = []
-        for i in range(2):
-            texture = load_texture_pair(main_path / f"alienGreen_walk{i}.png")
-            self.walk_textures.append(texture)
-
-        # Load textures for climbing
-        self.climbing_textures = []
-        texture = arcade.load_texture(main_path / f"alienGreen_climb1.png")
-        self.climbing_textures.append(texture)
-        texture = arcade.load_texture(main_path / f"alienGreen_climb2.png")
-        self.climbing_textures.append(texture)
-
-        # Set the initial texture
-        self.texture = self.idle_texture_pair[0]
-
-        # Hit box will be set based on the first image used. If you want to specify
-        # a different hit box, you can do it like the code below.
-        # set_hit_box = [[-22, -64], [22, -64], [22, 28], [-22, 28]]
-        self.hit_box = self.texture.hit_box_points
-
-    def update_animation(self, delta_time: float = 1 / 60):
-
-        # Figure out if we need to flip face left or right
-        if self.change_x < 0 and self.facing_direction == RIGHT_FACING:
-            self.facing_direction = LEFT_FACING
-        elif self.change_x > 0 and self.facing_direction == LEFT_FACING:
-            self.facing_direction = RIGHT_FACING
-
-        # Climbing animation
-        if self.is_on_ladder:
-            self.climbing = True
-        if not self.is_on_ladder and self.climbing:
-            self.climbing = False
-        if self.climbing and abs(self.change_y) > 1:
-            self.cur_texture += 1
-            if self.cur_texture > 7:
-                self.cur_texture = 0
-        if self.climbing:
-            self.texture = self.climbing_textures[self.cur_texture // 4]
-            return
-
-        # Jumping animation
-        if self.change_y > 0 and not self.is_on_ladder:
-            self.texture = self.jump_texture_pair[self.facing_direction]
-            return
-
-        # Idle animation
-        if self.change_x == 0:
-            self.texture = self.idle_texture_pair[self.facing_direction]
-            return
-
-        # Walking animation
-        self.cur_texture += 1
-        if self.cur_texture > 1:
-            self.cur_texture = 0
-        self.texture = self.walk_textures[self.cur_texture][self.facing_direction]
-
-
-class MainMenu(arcade.View):
-    """Class that manages the 'menu' view."""
-
-    def __init__(self):
-        super().__init__()
-        imgPath = ASSETS_PATH / 'images' / 'MainMenuBackground'
-        self.backgroundImg = arcade.load_texture(imgPath / f'secondary.jpg')
-
-    def on_show(self):
-        """Called when switching to this view."""
-        arcade.set_background_color(arcade.color.WHITE)
-
-    def on_draw(self):
-        """Draw the menu"""
-        self.clear()
-        arcade.draw_texture_rectangle(
-            center_x=SCREEN_WIDTH / 2,
-            center_y=SCREEN_HEIGHT / 2,
-            width=SCREEN_WIDTH,
-            height=SCREEN_HEIGHT,
-            texture=self.backgroundImg
-        )
-        arcade.draw_text(
-            "Main Menu - Click to play game",
-            SCREEN_WIDTH / 2,
-            SCREEN_HEIGHT / 2,
-            arcade.color.BLACK,
-            font_size=30,
-            anchor_x="center",
-        )
-
-        arcade.draw_text(
-            "Move: W, S, A, D",
-            SCREEN_WIDTH / 2,
-            SCREEN_HEIGHT / 2 - 40,
-            arcade.color.BLACK,
-            font_size=30,
-            anchor_x="center",
-        )
-
-        arcade.draw_text(
-            "Attack: SPACE",
-            SCREEN_WIDTH / 2,
-            SCREEN_HEIGHT / 2 - 80,
-            arcade.color.BLACK,
-            font_size=30,
-            anchor_x="center",
-        )
-
-    def on_mouse_press(self, _x, _y, _button, _modifiers):
-        """Use a mouse press to advance to the 'game' view."""
-        game_view = GameView()
-        self.window.show_view(game_view)
-
-
-def read_pos(str):
-    str = str.split(',')
-    return float(str[0]), float(str[1]), int(str[2]), float(str[3])
-
-
-def make_pos(tup):
-    return str(tup[0]) + "," + str(tup[1]) + "," + str(tup[2]) + "," + str(tup[3])
-
-
-class GameView(arcade.View):
+import os
+
+import arcade
+from constants import *
+from entities.Fly import Fly
+from entities.Player import Player
+from entities.Saw import Saw
+from entities.SlimeBlue import SlimeBlue
+from entities.SlimeGreen import SlimeGreen
+
+from network import Network
+from utils import *
+
+import views.gameOver as gameover
+import views.gameComplete as gamecomplete
+
+class MultiPlayerView(arcade.View):
     """
     Main application class.
     """
@@ -427,7 +97,7 @@ class GameView(arcade.View):
 
         # Map name
         map_path = pathlib.Path(__file__).resolve(
-        ).parent.parent / 'arcade_platformer'
+        ).parent.parent / 'levels'
         map_name = map_path / f"platform_level_0{self.level}.json"
         # Layer Specific Options for the Tilemap
         layer_options = {
@@ -457,12 +127,12 @@ class GameView(arcade.View):
         # Setting before using scene.add_sprite allows us to define where the SpriteList
         # will be in the draw order. If we just use add_sprite, it will be appended to the
         # end of the order.
-        self.player_sprite = PlayerCharacter()
+        self.player_sprite = Player()
         self.player_sprite.center_x = PLAYER_START_X
         self.player_sprite.center_y = PLAYER_START_Y
-        self.player_sprite_2 = PlayerCharacter()
+        self.player_sprite_2 = Player()
         self.player_sprite_2.center_x = PLAYER_START_X + 50
-        self.player_sprite_2.center_y = PLAYER_START_Y + 50
+        self.player_sprite_2.center_y = PLAYER_START_Y
         self.scene.add_sprite_list_after(
             LAYER_NAME_PLAYER, LAYER_NAME_BACKGROUND)
         self.scene.add_sprite_list_after(LAYER_NAME_PLAYER, LAYER_NAME_LADDERS)
@@ -561,15 +231,6 @@ class GameView(arcade.View):
             18,
         )
 
-        # times_left = f"Times: {math.floor(self.times)}"
-        # arcade.draw_text(
-        #     times_left,
-        #     880,
-        #     620,
-        #     arcade.csscolor.BLACK,
-        #     18,
-        # )
-
     def process_keychange(self):
         """
         Called when we change a key up/down or we move on/off a ladder.
@@ -647,7 +308,6 @@ class GameView(arcade.View):
     def on_update(self, delta_time):
         """Movement and game logic"""
         # Send and recived player 2 pos here
-
         p2Pos = read_pos(self.n.send(
             make_pos((self.player_sprite.center_x, self.player_sprite.center_y, 0, self.player_sprite.facing_direction))))
 
@@ -679,19 +339,6 @@ class GameView(arcade.View):
             else:
                 bullet.range_limit = self.player_sprite_2.center_x - 320
             self.scene.add_sprite(LAYER_NAME_BULLETS, bullet)
-        # self.times -= delta_time
-        # if self.times < 0:
-        #     arcade.play_sound(self.game_over)
-        #     self.player_sprite.center_x = PLAYER_START_X
-        #     self.player_sprite.center_y = PLAYER_START_Y
-        #     self.lives -= 1
-        #     self.high_score = self.score if (self.score > self.high_score) else self.high_score;
-        #     self.score = 0;
-        #     self.times = TIME_LIMIT;
-        #     if (self.lives == 0):
-        #         game_over = GameOverView(self.high_score)
-        #         self.window.show_view(game_over)
-        #         return
         if self.physics_engine.can_jump():
             self.player_sprite.can_jump = False
         else:
@@ -815,7 +462,7 @@ class GameView(arcade.View):
                 self.score = 0
                 # self.times = TIME_LIMIT;
                 if (self.lives == 0):
-                    game_over = GameOverView(self.high_score)
+                    game_over = gameover.GameOverView(self.high_score)
                     self.window.show_view(game_over)
                 return
             if self.scene["Doors"] in collision.sprite_lists:
@@ -824,7 +471,7 @@ class GameView(arcade.View):
                 # self.score += math.floor(self.times * 10);
                 self.lives = 3
                 if self.level == LEVELS:
-                    game_complete = GameCompleteView(self.high_score)
+                    game_complete = gamecomplete.GameCompleteView(self.high_score)
                     self.window.show_view(game_complete)
                     return
                 # Load the next level
@@ -853,7 +500,7 @@ class GameView(arcade.View):
             self.score = 0
             # self.times = TIME_LIMIT;
             if (self.lives == 0):
-                game_over = GameOverView(self.high_score)
+                game_over = gameover.GameOverView(self.high_score)
                 self.window.show_view(game_over)
 
         # Did the player touch something they should not?
@@ -869,7 +516,7 @@ class GameView(arcade.View):
             self.score = 0
             # self.times = TIME_LIMIT;
             if (self.lives == 0):
-                game_over = GameOverView(self.high_score)
+                game_over = gameover.GameOverView(self.high_score)
                 self.window.show_view(game_over)
 
     def center_camera_to_player(self):
@@ -877,7 +524,6 @@ class GameView(arcade.View):
             (self.camera.viewport_width / 2)
         screen_center_y = self.player_sprite.center_y - \
             (self.camera.viewport_height / 2)
-        # print(screen_center_x, screen_center_y)
         # Don't let camera travel past 0
         if screen_center_x < 0:
             screen_center_x = 0
@@ -890,200 +536,3 @@ class GameView(arcade.View):
         player_centered = screen_center_x, screen_center_y
         # print(player_centered)
         self.camera.move_to(player_centered)
-
-
-class GameOverView(arcade.View):
-    """Class to manage the game overview"""
-
-    def __init__(self, high_score= 0):
-        super().__init__()
-        self.high_score = high_score
-
-        imgPath = ASSETS_PATH / 'images' / 'MainMenuBackground'
-        self.backgroundImg = arcade.load_texture(imgPath / f'third.jpg')
-
-    def on_show(self):
-        """Called when switching to this view"""
-        arcade.set_background_color(arcade.color.BLACK)
-
-    def on_draw(self):
-        """Draw the game overview"""
-        self.clear()
-        arcade.draw_texture_rectangle(
-            center_x=SCREEN_WIDTH / 2,
-            center_y=SCREEN_HEIGHT / 2,
-            width=SCREEN_WIDTH,
-            height=SCREEN_HEIGHT,
-            texture=self.backgroundImg
-        )
-        arcade.draw_text(
-            "Game Over",
-            SCREEN_WIDTH / 2,
-            SCREEN_HEIGHT / 2 + 100,
-            arcade.color.BLACK,
-            30,
-            anchor_x="center",
-        )
-        arcade.draw_text(
-            "High Score: " + str(self.high_score),
-            SCREEN_WIDTH / 2,
-            SCREEN_HEIGHT / 2,
-            arcade.color.BLACK,
-            30,
-            anchor_x="center",
-        )
-
-        arcade.draw_text(
-            "Click to return to main menu!",
-            SCREEN_WIDTH / 2,
-            SCREEN_HEIGHT / 2 - 100,
-            arcade.color.BLACK,
-            30,
-            anchor_x="center",
-        )
-
-    def on_mouse_press(self, _x, _y, _button, _modifiers):
-        """Use a mouse press to advance to the 'game' view."""
-        my_window = MyWindow()
-        self.window.show_view(my_window)
-
-
-class QuitButton(arcade.gui.UIFlatButton):
-    def on_click(self, event: arcade.gui.UIOnClickEvent):
-        arcade.exit()
-
-
-class GameCompleteView(arcade.View):
-    """Class to manage the game overview"""
-
-    def __init__(self, high_score= 0):
-        super().__init__()
-        self.high_score = high_score
-
-    def on_show(self):
-        """Called when switching to this view"""
-        arcade.set_background_color(arcade.color.BLACK)
-
-    def on_draw(self):
-        """Draw the game overview"""
-        self.clear()
-        arcade.draw_text(
-            "Thanks for playing!",
-            SCREEN_WIDTH / 2,
-            SCREEN_HEIGHT / 2 + 200,
-            arcade.color.WHITE,
-            30,
-            anchor_x="center",
-        )
-        arcade.draw_text(
-            "You completed Geamonkee Adventure!",
-            SCREEN_WIDTH / 2,
-            SCREEN_HEIGHT / 2 + 100,
-            arcade.color.WHITE,
-            30,
-            anchor_x="center",
-        )
-        arcade.draw_text(
-            "High Score: " + str(self.high_score),
-            SCREEN_WIDTH / 2,
-            SCREEN_HEIGHT / 2,
-            arcade.color.WHITE,
-            30,
-            anchor_x="center",
-        )
-
-        arcade.draw_text(
-            "Click to return to main menu!",
-            SCREEN_WIDTH / 2,
-            SCREEN_HEIGHT / 2 - 100,
-            arcade.color.WHITE,
-            30,
-            anchor_x="center",
-        )
-
-    def on_mouse_press(self, _x, _y, _button, _modifiers):
-        """Use a mouse press to advance to the 'game' view."""
-        my_window = MyWindow()
-        self.window.show_view(my_window)
-
-# --- Method 1 for handling click events,
-# Create a child class.
-
-
-class QuitButton(arcade.gui.UIFlatButton):
-    def on_click(self, event: arcade.gui.UIOnClickEvent):
-        arcade.exit()
-
-
-class MyWindow(arcade.View):
-    def __init__(self):
-        # --- Required for all code that uses UI element,
-        # a UIManager to handle the UI.
-        super().__init__()
-        self.manager = arcade.gui.UIManager()
-        self.manager.enable()
-        imgPath = ASSETS_PATH / 'images' / 'MainMenuBackground'
-        self.backgroundImg = arcade.load_texture(imgPath / f'Main.jpg')
-        # Set background color
-        arcade.set_background_color(arcade.color.DARK_BLUE_GRAY)
-
-        # Create a vertical BoxGroup to align buttons
-        self.v_box = arcade.gui.UIBoxLayout()
-
-        # Create the buttons
-        start_button = arcade.gui.UIFlatButton(text="Start Game", width=200)
-        self.v_box.add(start_button.with_space_around(bottom=20))
-
-        tutorial_button = arcade.gui.UIFlatButton(text="Tutorial", width=200)
-        self.v_box.add(tutorial_button.with_space_around(bottom=20))
-
-        # Again, method 1. Use a child class to handle events.
-        quit_button = QuitButton(text="Quit", width=200)
-        self.v_box.add(quit_button)
-
-        # --- Method 2 for handling click events,
-        # assign self.on_click_start as callback
-        start_button.on_click = self.on_click_start
-
-        # --- Method 3 for handling click events,
-        # use a decorator to handle on_click events
-        @tutorial_button.event("on_click")
-        def on_click_tutorial(event):
-            self.manager.disable()
-            menu_view = MainMenu()
-            self.window.show_view(menu_view)
-
-        # Create a widget to hold the v_box widget, that will center the buttons
-        self.manager.add(
-            arcade.gui.UIAnchorWidget(
-                anchor_x="center_x",
-                anchor_y="center_y",
-                child=self.v_box)
-        )
-
-    def on_click_start(self, event):
-        self.manager.disable()
-        game_view = GameView()
-        self.window.show_view(game_view)
-
-    def on_draw(self):
-        self.clear()
-        arcade.draw_texture_rectangle(
-            center_x=SCREEN_WIDTH / 2,
-            center_y=SCREEN_HEIGHT / 2,
-            width=SCREEN_WIDTH,
-            height=SCREEN_HEIGHT,
-            texture=self.backgroundImg
-        )
-        self.manager.draw()
-
-
-def main():
-    window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    game_start = MyWindow()
-    window.show_view(game_start)
-    arcade.run()
-
-
-if __name__ == "__main__":
-    main()

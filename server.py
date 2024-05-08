@@ -1,8 +1,7 @@
 import socket
 from _thread import *
-import sys
 from constants import *
-
+from utils import *
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -13,16 +12,6 @@ except socket.error as e:
 
 s.listen(2)
 print("Waiting for connection, Server started")
-
-
-def read_pos(str):
-    str = str.split(',')
-    return float(str[0]), float(str[1]), int(str[2]), float(str[3])
-
-
-def make_pos(tup):
-    return str(tup[0]) + "," + str(tup[1]) + "," + str(tup[2]) + "," + str(tup[3])
-
 
 pos = [(0, 0, 0, 1), (100, 100, 0, 1)]
 
