@@ -15,6 +15,7 @@ from utils import *
 import views.game_over as gameover
 import views.game_complete as gamecomplete
 
+
 class MultiPlayerView(arcade.View):
     """
     Main application class.
@@ -28,6 +29,7 @@ class MultiPlayerView(arcade.View):
         file_path = os.path.dirname(os.path.abspath(__file__))
         os.chdir(file_path)
         self.n = Network()
+        self.players = 1
 
         # Track the current state of what key is pressed
         self.left_pressed = False
@@ -67,7 +69,7 @@ class MultiPlayerView(arcade.View):
         self.end_of_map = 0
 
         # Level
-        self.level = 2
+        self.level = 1
 
         # Lives
         self.lives = 3
@@ -230,6 +232,32 @@ class MultiPlayerView(arcade.View):
             arcade.csscolor.BLACK,
             18,
         )
+        if (self.level == 1):
+            currentPlayers = f"Connected players: {self.players}"
+            arcade.draw_text(
+                currentPlayers,
+                SCREEN_WIDTH / 2,
+                SCREEN_HEIGHT - 200,
+                arcade.csscolor.BLACK,
+                18,
+            )
+
+            if (self.players < 2):
+                arcade.draw_text(
+                    "Waiting for other players",
+                    SCREEN_WIDTH / 2 - SCREEN_WIDTH / 4,
+                    100 + 20,
+                    arcade.csscolor.BLACK,
+                    18,
+                )
+            else:
+                arcade.draw_text(
+                    "Head to the door to start the game!",
+                    SCREEN_WIDTH / 2 - SCREEN_WIDTH / 4 ,
+                    100 + 20,
+                    arcade.csscolor.BLACK,
+                    18,
+                )
 
     def process_keychange(self):
         """
@@ -300,21 +328,25 @@ class MultiPlayerView(arcade.View):
         elif key == arcade.key.RIGHT or key == arcade.key.D:
             self.right_pressed = False
             self.right_down = False
-
         if key == arcade.key.SPACE:
             self.shoot_pressed = False
         self.process_keychange()
 
     def on_update(self, delta_time):
         """Movement and game logic"""
+
         # Send and recived player 2 pos here
         p2Pos = read_pos(self.n.send(
-            make_pos((self.player_sprite.center_x, self.player_sprite.center_y, 0, self.player_sprite.facing_direction))))
+            make_pos((self.player_sprite.center_x, self.player_sprite.center_y, 0, self.player_sprite.facing_direction, self.level, 1))))
 
-        self.player_sprite_2.center_x = p2Pos[0]
-        self.player_sprite_2.center_y = p2Pos[1]
-        self.player_sprite_2.facing_direction = p2Pos[3]
-
+        if (p2Pos[5] == 1 and p2Pos[4] == self.level):
+            if (self.players < 2):
+                self.players += 1
+            self.player_sprite_2.center_x = p2Pos[0]
+            self.player_sprite_2.center_y = p2Pos[1]
+            self.player_sprite_2.facing_direction = p2Pos[3]
+        else:
+            self.player_sprite_2.center_x = -100
         # Update the physics engine
         self.physics_engine_2.update()
         # Move the player with the physics engine
@@ -326,7 +358,7 @@ class MultiPlayerView(arcade.View):
             bullet = arcade.Sprite(
                 main_path / f"fireball_1.png",
                 SPRITE_SCALING_LASER,
-                )
+            )
             if self.player_sprite_2.facing_direction == RIGHT_FACING:
                 bullet.change_x = BULLET_SPEED
             else:
@@ -372,7 +404,7 @@ class MultiPlayerView(arcade.View):
                     bullet.range_limit = self.player_sprite.center_x - 320
 
                 self.n.send(
-                    make_pos((self.player_sprite.center_x, self.player_sprite.center_y, 1, self.player_sprite.facing_direction)))
+                    make_pos((self.player_sprite.center_x, self.player_sprite.center_y, 1, self.player_sprite.facing_direction, self.level, 1)))
                 self.scene.add_sprite(LAYER_NAME_BULLETS, bullet)
                 self.can_shoot = False
         else:
@@ -467,16 +499,18 @@ class MultiPlayerView(arcade.View):
                 return
             if self.scene["Doors"] in collision.sprite_lists:
                 # Advance to the next level
-                self.level += 1
-                # self.score += math.floor(self.times * 10);
-                self.lives = 3
-                if self.level == LEVELS:
-                    game_complete = gamecomplete.GameCompleteView(self.high_score)
-                    self.window.show_view(game_complete)
-                    return
-                # Load the next level
-                # self.times = TIME_LIMIT
-                self.setup(self.score)
+                if (p2Pos[5] == 1):
+                    self.level += 1
+                    # self.score += math.floor(self.times * 10);
+                    self.lives = 3
+                    if self.level == LEVELS:
+                        game_complete = gamecomplete.GameCompleteView(
+                            self.high_score)
+                        self.window.show_view(game_complete)
+                        return
+                    # Load the next level
+                    # self.times = TIME_LIMIT
+                    self.setup(self.score)
             else:
                 # Figure out how many points this coin is worth
                 if "point_value" not in collision.properties:

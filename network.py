@@ -19,7 +19,7 @@ class Network:
       return self.client.recv(2048).decode()
     except:
       pass
-
+    
   def send(self, data):
     try:
       self.client.send(str.encode(data))
