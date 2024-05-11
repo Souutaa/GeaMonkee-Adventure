@@ -11,11 +11,11 @@ try:
 except socket.error as e:
     str(e)
 
-s.listen(2)
+s.listen(10)
 print("Waiting for connection, Server started")
 
 # center_x, center_y, is_shooting, facing_direction, current_level, connected
-pos = [(0, 0, 0, 1, 1, 0), (-100, 100, 0, 1, 1, 0)]
+pos = [(0, 0, 0, 1, 1, 0, 0), (-100, 100, 0, 1, 1, 0, 0)]
 
 def threaded_client(conn, player):
     conn.send(str.encode(make_pos(pos[player])))
@@ -44,5 +44,8 @@ def threaded_client(conn, player):
 while True:
     conn, addr = s.accept()
     print("Connected to: ", addr)
-    start_new_thread(threaded_client, (conn, currentPlayer))
-    currentPlayer += 1
+    if (currentPlayer <= 1):
+        start_new_thread(threaded_client, (conn, currentPlayer))
+        currentPlayer += 1
+    else:
+        start_new_thread(threaded_client, (conn, 1))

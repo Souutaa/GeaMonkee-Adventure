@@ -13,7 +13,7 @@ from network import Network
 from utils import *
 
 import views.game_over as gameover
-import views.game_complete as gamecomplete
+import views.multiplayer_complete as gamecomplete
 
 
 class MultiPlayerView(arcade.View):
@@ -337,7 +337,7 @@ class MultiPlayerView(arcade.View):
 
         # Send and recived player 2 pos here
         p2Pos = read_pos(self.n.send(
-            make_pos((self.player_sprite.center_x, self.player_sprite.center_y, 0, self.player_sprite.facing_direction, self.level, 1))))
+            make_pos((self.player_sprite.center_x, self.player_sprite.center_y, 0, self.player_sprite.facing_direction, self.level, 1, self.score))))
 
         if (p2Pos[5] == 1 and p2Pos[4] == self.level):
             if (self.players < 2):
@@ -404,7 +404,7 @@ class MultiPlayerView(arcade.View):
                     bullet.range_limit = self.player_sprite.center_x - 320
 
                 self.n.send(
-                    make_pos((self.player_sprite.center_x, self.player_sprite.center_y, 1, self.player_sprite.facing_direction, self.level, 1)))
+                    make_pos((self.player_sprite.center_x, self.player_sprite.center_y, 1, self.player_sprite.facing_direction, self.level, 1, self.score)))
                 self.scene.add_sprite(LAYER_NAME_BULLETS, bullet)
                 self.can_shoot = False
         else:
@@ -503,9 +503,9 @@ class MultiPlayerView(arcade.View):
                     self.level += 1
                     # self.score += math.floor(self.times * 10);
                     self.lives = 3
-                    if self.level == LEVELS:
-                        game_complete = gamecomplete.GameCompleteView(
-                            self.high_score)
+                    if self.level == 2:
+                        game_complete = gamecomplete.MultiPlayerCompleteView(
+                            self.score, p2Pos[6])
                         self.window.show_view(game_complete)
                         return
                     # Load the next level
