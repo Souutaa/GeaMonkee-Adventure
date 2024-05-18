@@ -503,7 +503,7 @@ class MultiPlayerView(arcade.View):
                     self.level += 1
                     # self.score += math.floor(self.times * 10);
                     self.lives = 3
-                    if self.level == 2:
+                    if self.level == 3:
                         game_complete = gamecomplete.MultiPlayerCompleteView(
                             self.score, p2Pos[6])
                         self.window.show_view(game_complete)

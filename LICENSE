@@ -1,0 +1,33 @@
+GeaMonkee-Adventure License
+This project is licensed under the MIT License - see the LICENSE.md file for details
+
+Summary of the License
+The MIT License is a permissive free software license. Its main points are:
+
+You can use the software for any purpose, commercial or non-commercial.
+You can modify the software.
+You can distribute the software, even in modified form.
+You must include the copyright notice and permission notice in all copies of the software.
+You are not required to provide the source code of your modifications.
+The software is provided "as is", without warranty of any kind.
+Additional Considerations
+This project uses third-party libraries that may have their own licenses. Please refer to the individual library licenses for more information.
+If you are unsure about the terms of this license, please consult with a lawyer.
+Copyright
+Copyright (c) 2023 Group 2 (Trịnh Quang Long, Lê Thái Vi, Hà Quốc Vĩ, Nguyễn Hoàng Khôi Nguyên)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
